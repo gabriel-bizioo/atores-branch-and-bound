@@ -16,9 +16,8 @@ void lista_int_add(lista_int *list, int item) {
 void lista_int_remove(lista_int *list, int item) {
     for (int i = 0; i < list->size; i++) {
         if (list->itens[i] == item) {
-            for (int j = i; j < list->size - 1; j++) {
+            for (int j = i; j < list->size - 1; j++)
                 list->itens[j] = list->itens[j + 1];
-            }
             list->size--;
 
             if (list->size == 0) {
@@ -43,12 +42,12 @@ void lista_int_destroy(lista_int *list) {
 lista_int lista_int_copy(lista_int *src) {
     lista_int copy;
     lista_int_init(&copy);
-    
+
     if (src->size > 0) {
         copy.itens = malloc(src->size * sizeof(int));
         copy.size = src->size;
         memcpy(copy.itens, src->itens, src->size * sizeof(int));
     }
-    
+
     return copy;
 }

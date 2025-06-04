@@ -25,10 +25,10 @@ void lista_ator_destroy(lista_ator *list) {
     list->size = 0;
 }
 
-estado *cria_estado() {
+estado *cria_estado_inicial(problema *p) {
     estado *e = malloc(sizeof(estado));
     e->custo = 0;
-    lista_int_init(&e->S_e);
+    e->S_e = lista_int_copy(&p->S);
     lista_int_init(&e->X);
     return e;
 }
@@ -51,8 +51,7 @@ void destroi_estado(estado *e) {
     free(e);
 }
 
-// Problema
-problema *cria_problema(int l, int m, int n) {
+problema *cria_problema(int l, int n) {
     problema *p = malloc(sizeof(problema));
     p->otim = INT_MAX;
     p->nos_explorados = 0;
@@ -61,13 +60,12 @@ problema *cria_problema(int l, int m, int n) {
     lista_ator_init(&p->A);
     lista_int_init(&p->P);
 
-    // Inicializa conjuntos S e P com índices 1..l e 1..n
     for (int i = 1; i <= l; i++)
         lista_int_add(&p->S, i);
     for (int i = 1; i <= n; i++)
         lista_int_add(&p->P, i);
 
-    p->E = NULL;  // Melhor solução encontrada
+    p->E = NULL; // Solucao viavel do problema
     return p;
 }
 
@@ -78,9 +76,8 @@ void destroi_problema(problema *p) {
     lista_ator_destroy(&p->A);
     lista_int_destroy(&p->P);
 
-    if (p->E) {
+    if (p->E)
         destroi_estado(p->E);
-    }
 
     free(p);
 }

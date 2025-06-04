@@ -57,11 +57,10 @@ problema *le_instancia() {
         exit(1);
     }
 
-    problema *p = cria_problema(l, m, n);
+    problema *p = cria_problema(l, n);
 
     for (int i = 0; i < m; i++) {
         ator a;
-        a.id = i + 1;
 
         int r, s;
         if (scanf("%d %d %d", &a.valor, &r, &s) != 3) {
@@ -131,7 +130,7 @@ int main(int argc, char *argv[]) {
 
     problema *p = le_instancia();
 
-    estado *inicial = cria_estado();
+    estado *inicial = cria_estado_inicial(p);
 
     int (*bound_function)(problema*, estado*);
     if (usar_bound_professor) {
@@ -141,9 +140,7 @@ int main(int argc, char *argv[]) {
     }
 
     clock_t tempo_inicio = clock();
-
     branch_bound(p, inicial, bound_function);
-
     clock_t tempo_fim = clock();
 
     double tempo_total = (double)(tempo_fim - tempo_inicio)/CLOCKS_PER_SEC;
