@@ -53,48 +53,51 @@ int B_melhorada(problema *p, estado *e) {
  */
 void branch_bound(problema *p, estado *e, int (*bound)(problema*, estado*)) {
     p->nos_explorados++;
-    if((p->P.size - e->X.size)) {
 
-        // Itera por todos os atores ainda nao escolhidos
-        for(int i = 0; i < p->A.size; ++i) {
-            ator a = p->A.ator[i];
-            // Pula atores ja escolhidos
-            int pular = 0;
-            for(int j = 0; j < e->X.size; ++j) {
-                if(e->X.itens[j] == i + 1)
-                    pular = 1;
-                break;
-            }
-            if(pular)
-                continue;
-
-            // Verifica se o ator pode fazer o papel sendo testado atualmente
-            for(int j = 0; j < a.P_a.size; ++j) {
-
-                // Se pode, faz a chamada recursiva para o proximo estado
-                if((e->X.size+1) == a.P_a.itens[j]) {
-
-                    estado *novo_e = copia_estado(e);
-                    novo_e->custo += a.valor;
-                    lista_int_add(&novo_e->X, (i+1));
-                    for(int z = 0; z < a.S_a.size; ++z)
-                        lista_int_remove(&novo_e->S_e, a.S_a.itens[z]);
-
-                    if(p->otim >= bound(p, novo_e)) // Adicionar verificacao da flag -o
-                        branch_bound(p, novo_e, bound);
-                    destroi_estado(novo_e);
-                }
-            }
-        }
-    }
-    else if(e->S_e.size == 0) {
+    // Base da recursao (todos os personagens escolhidos)
+    if ((e->S_e.size == 0) && !(p->P.size - e->X.size)) {
         if(e->custo <= p->otim) {
             p->otim = e->custo;
             if(p->E != NULL)
                 destroi_estado(p->E);
             p->E = copia_estado(e);
-            return;
         }
+        return;
     }
 
+    // solucao inviavel
+    if(!(p->P.size - e->X.size))
+        return;
+
+    // Itera por todos os atores ainda nao escolhidos
+    for (int i = 0; i < p->A.size; ++i) {
+        ator a = p->A.ator[i];
+        // Pula atores ja escolhidos
+        int pular = 0;
+        for (int j = 0; j < e->X.size; ++j) {
+            if(e->X.itens[j] == i + 1)
+                pular = 1;
+            break;
+        }
+        if(pular)
+            continue;
+
+        // Verifica se o ator pode fazer o papel sendo testado atualmente
+        for (int j = 0; j < a.P_a.size; ++j) {
+
+            // Se pode, faz a chamada recursiva para o proximo estado
+            if ((e->X.size+1) == a.P_a.itens[j]) {
+
+                estado *novo_e = copia_estado(e);
+                novo_e->custo += a.valor;
+                lista_int_add(&novo_e->X, (i+1));
+                for (int z = 0; z < a.S_a.size; ++z)
+                    lista_int_remove(&novo_e->S_e, a.S_a.itens[z]);
+
+                if (p->otim >= bound(p, novo_e)) // Adicionar verificacao da flag -o
+                    branch_bound(p, novo_e, bound);
+                destroi_estado(novo_e);
+            }
+        }
+    }
 }
