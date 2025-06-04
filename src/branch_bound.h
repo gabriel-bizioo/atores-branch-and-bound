@@ -6,12 +6,12 @@
 /*
  * Funcao de corte dada pelo professor para fins de comparacao
  */
-void B_dada(estado *e);
+int B_dada(problema *p, estado *e);
 
 /*
  * Funcao de corte feita pelo grupo
  */
-void B_melhorada(estado *e);
+int B_melhorada(problema *p, estado *e);
 
-void branch_bound(problema *p, estado *e, int (*bound)(estado*));
+void branch_bound(problema *p, estado *e, int (*bound)(problema*, estado*));
 #endif

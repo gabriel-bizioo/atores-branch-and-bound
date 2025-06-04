@@ -2,6 +2,7 @@
 #define __PROBLEMA__
 #include "util.h"
 
+
 typedef struct {
     int id;
     int valor;
@@ -14,7 +15,6 @@ typedef struct {
     int size;
 } lista_ator;
 
-void lista_ator_add(lista_ator list, ator item);
 
 typedef struct {
     int custo;
@@ -27,17 +27,22 @@ typedef struct {
     lista_int X;
 } estado;
 
-estado *copia_estado(estado *e);
-void destroi_estado(estado *e);
 
 typedef struct {
     int otim;
+    int nos_explorados;
     lista_int S;
     lista_ator A;
     lista_int P;
     estado *E;
 } problema;
 
+estado *cria_estado();
+estado *copia_estado(estado *e);
+void destroi_estado(estado *e);
+
 problema *cria_problema(int l, int m, int n);
+void destroi_problema(problema *p);
+void lista_ator_add(lista_ator *list, ator item);
 
 #endif
