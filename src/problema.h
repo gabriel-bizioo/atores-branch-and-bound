@@ -4,6 +4,7 @@
 
 
 typedef struct {
+    int id;
     int valor;
     lista_int S_a;
     lista_int P_a;

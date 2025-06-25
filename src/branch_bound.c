@@ -69,10 +69,11 @@ void branch_bound(problema *p, estado *e, int (*bound)(problema*, estado*)) {
     if(!(p->P.size - e->X.size))
         return;
 
-    // Itera por todos os atores ainda nao escolhidos
-    for (int i = 0; i < p->A.size; ++i) {
-        ator a = p->A.ator[i];
-        // Pula atores ja escolhidos
+    int tam_Cl = p->A.size - e->X.size;
+    printf("%d\n", tam_Cl);
+    ator *Cl[tam_Cl];
+    int count = 0;
+    for(int i = 0; i < p->A.size; ++i) {
         int pular = 0;
         for (int j = 0; j < e->X.size; ++j) {
             if(e->X.itens[j] == i + 1)
@@ -81,23 +82,38 @@ void branch_bound(problema *p, estado *e, int (*bound)(problema*, estado*)) {
         }
         if(pular)
             continue;
+        printf("Ator %d em Cl\n", p->A.ator[i].id);
+        Cl[count] = &p->A.ator[i];
+        count++;
+    }
 
-        // Verifica se o ator pode fazer o papel sendo testado atualmente
-        for (int j = 0; j < a.P_a.size; ++j) {
+    int nextbound[tam_Cl];
+    int nextchoice[tam_Cl];
+    for(int i = 0; i < tam_Cl; ++i) {
 
-            // Se pode, faz a chamada recursiva para o proximo estado
-            if ((e->X.size+1) == a.P_a.itens[j]) {
+        estado *novo_e = copia_estado(e);
+        novo_e->custo += Cl[i]->valor;
+        lista_int_add(&novo_e->X, Cl[i]->id);
+        for (int j = 0; j < Cl[i]->S_a.size; ++j)
+            lista_int_remove(&novo_e->S_e, Cl[i]->S_a.itens[j]);
 
-                estado *novo_e = copia_estado(e);
-                novo_e->custo += a.valor;
-                lista_int_add(&novo_e->X, (i+1));
-                for (int z = 0; z < a.S_a.size; ++z)
-                    lista_int_remove(&novo_e->S_e, a.S_a.itens[z]);
+        nextchoice[i] = Cl[i]->id;
+        nextbound[i] = bound(p, novo_e);
+        printf("i: %d\tbound: %d\tchoice: %d\n", i, nextbound[i], nextchoice[i]);
+        destroi_estado(novo_e);
+    }
 
-                if (p->otim >= bound(p, novo_e)) // Adicionar verificacao da flag -o
-                    branch_bound(p, novo_e, bound);
-                destroi_estado(novo_e);
-            }
-        }
+    // "Sort nextchoice and nextbound so that nextbound is in decreasing order"
+    
+    for(int i = 0; i < tam_Cl; ++i) {
+        if(nextbound[i] >= p->otim)
+            continue;
+
+        estado *novo_e = copia_estado(e);
+        novo_e->custo += Cl[i]->valor;
+        lista_int_add(&novo_e->X, nextchoice[i]); // Teria que mudar a estrutura
+        for (int j = 0; j < Cl[i]->S_a.size; ++j)
+            lista_int_remove(&novo_e->S_e, Cl[i]->S_a.itens[j]);
+        branch_bound(p, novo_e, bound);
     }
 }

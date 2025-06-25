@@ -61,6 +61,7 @@ problema *le_instancia() {
 
     for (int i = 0; i < m; i++) {
         ator a;
+        a.id = i+1;
 
         int r, s;
         if (scanf("%d %d %d", &a.valor, &r, &s) != 3) {
